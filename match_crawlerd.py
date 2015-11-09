@@ -4,6 +4,7 @@
 import ConfigParser
 import requests
 import daemon
+import redis
 
 api_key = config.get("user", "api_key")
 region = "kr"
@@ -21,9 +22,15 @@ def getMatchDetails(region, match_id, api_key, ver="v2.2"):
     else:
         return None
 
+def setRedisConn(host="localhost", port="6379"):
+    redis.Redis()
+
 def main():
     while True:
-        pass
+        match_details = getMatchDetails("kr", match_id=match_id, api_key=api_key)
+        if match_details is not None:
+            mid = match_details.pop("matchId")
+            
 
 def runAsDaemon():
     with daemon.DaemonContext():
