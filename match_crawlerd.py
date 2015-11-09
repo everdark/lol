@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import traceback
 import ConfigParser
 import requests
 import daemon
@@ -28,7 +29,7 @@ def increaseId(match_id, inc=1):
 
 def main():
     config = ConfigParser.ConfigParser()
-    if len(config.read(['conf.ini'])):
+    if len(config.read(['/home/pi/lol/conf.ini'])):
         api_key = config.get("user", "api_key")
         redis_host = config.get("redis", "host")
         redis_port = config.get("redis", "port")
@@ -62,7 +63,11 @@ def main():
 
 def runAsDaemon():
     with daemon.DaemonContext():
-        main()
+        try:
+            main()
+        except:
+            f = open("/home/pi/lol/log", 'w')
+            f.write(traceback.format_exc())
 
 if __name__ == "__main__":
     runAsDaemon()
