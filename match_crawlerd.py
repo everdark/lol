@@ -6,10 +6,6 @@ import requests
 import daemon
 import redis
 
-api_key = config.get("user", "api_key")
-region = "kr"
-match_id = "2083727714" # one of Faker's solo-rank match
-
 def getMatchDetails(region, match_id, api_key, ver="v2.2"):
     api_server = "https://%s.api.pvp.net" % region
     api_call = "%s/api/lol/%s/%s/match/%s" % (api_server, region, ver, match_id)
@@ -23,14 +19,15 @@ def getMatchDetails(region, match_id, api_key, ver="v2.2"):
         return None
 
 def setRedisConn(host="localhost", port="6379"):
-    redis.Redis()
+    r = redis.Redis(host=host, port=port)
+    return r
 
 def main():
     while True:
-        match_details = getMatchDetails("kr", match_id=match_id, api_key=api_key)
+        match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
         if match_details is not None:
             mid = match_details.pop("matchId")
-            
+            redis.hmset(mid, match_details)
 
 def runAsDaemon():
     with daemon.DaemonContext():
@@ -39,7 +36,15 @@ def runAsDaemon():
 if __name__ == "__main__":
     config = ConfigParser.ConfigParser()
     if len(config.read(['conf.ini'])):
+        api_key = config.get("user", "api_key")
+        region = "kr"
+        redis_host = config.get("redis", "host")
+        redis_port = config.get("redis", "port")
+        redis = setRedisConn(host=redis_host, port=redis_port)
         runAsDaemon()
     else:
         print "File conf.ini not found. Program aborted."
         exit(1)
+
+
+
