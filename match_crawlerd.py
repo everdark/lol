@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-
 import ConfigParser
 import requests
 import daemon
 import redis
+import time
 
 def getMatchDetails(region, match_id, api_key, ver="v2.2"):
     api_server = "https://%s.api.pvp.net" % region
@@ -19,7 +19,7 @@ def getMatchDetails(region, match_id, api_key, ver="v2.2"):
         return None
 
 def setRedisConn(host="localhost", port="6379"):
-    r = redis.Redis(host=host, port=port)
+    r = redis.Redis(host=host, port=port, db=0)
     return r
 
 def main():
@@ -28,6 +28,7 @@ def main():
         if match_details is not None:
             mid = match_details.pop("matchId")
             redis.hmset(mid, match_details)
+        time.sleep(1)
 
 def runAsDaemon():
     with daemon.DaemonContext():
