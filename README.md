@@ -3,7 +3,8 @@ This repo is in early beta and hence is highly dynamic.
 
 ### System dependencies
 
-+ [Redis](http://redis.io)
++ ~~[Redis](http://redis.io)~~
++ [mongoDB](https://www.mongodb.org)
 + [Python2.7](https://www.python.org/download/releases/2.7/)
 + Python modules
     + [`requests`](http://docs.python-requests.org/en/latest/)
