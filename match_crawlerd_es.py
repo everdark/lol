@@ -50,11 +50,10 @@ def main():
             match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
         else:
             last_match = last_updated[0]["_source"]["matchId"]
-
-        if not len(last_match):
-            match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
-        else:
-            match_id = increaseId(last_match)
+            if not len(last_match):
+                match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
+            else:
+                match_id = increaseId(last_match)
 
         while True:
             # crawl the match data
