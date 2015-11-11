@@ -59,11 +59,9 @@ def main():
             # crawl the match data
             match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
             if match_details is not None:
-                match_details["_id"] = match_details.pop("matchId") # replace the default es _id
-                es.create(index="match", doc_type="updatetime", 
-                          body= {"matchId": match_details["_id"], "date": int(time.time())} )
-                es.create(index="match", doc_type="details", 
-                          body=match_details)
+                mid = match_details.pop("matchId") # replace the default es _id
+                es.create("match", "updatetime", body={"matchId": mid, "date": int(time.time())} )
+                es.create("match", "details", id=mid, body=match_details)
             match_id = increaseId(match_id)    
             time.sleep(1) # to avoid api overshooting (max 500 queries per 10 min)
     else:
