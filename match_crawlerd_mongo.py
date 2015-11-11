@@ -54,7 +54,7 @@ def main():
             match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
             if match_details is not None:
                 mid = match_details["matchId"]
-                mongo.AllMatchId.insert_one( {matchId: mid} )
+                mongo.AllMatchId.insert_one( {"matchId": mid} )
                 mongo.MatchDetails.insert_one(match_details)
             match_id = increaseId(match_id)    
             time.sleep(1) # to avoid api overshooting (max 500 queries per 10 min)
