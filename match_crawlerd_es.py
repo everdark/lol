@@ -4,7 +4,7 @@ import traceback
 import ConfigParser
 import requests
 import daemon
-from elasticsearch import Elasticsearch
+import elasticsearch
 import time
 
 def getLastMatch(region, seed_pid, api_key, ver="v1.3"):
@@ -42,11 +42,11 @@ def main():
         api_key = config.get("user", "api_key")
         es_host = config.get("elasticsearch", "host")
         es_port = config.get("elasticsearch", "port")
-        es = Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
+        es = elasticsearch.Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
 
         try:
             last_updated = es.search("match", "updatetime", size=1, sort="date:desc")["hits"]["hits"]
-        except NotFoundError as e: # for brand-new deployment
+        except elasticsearch.NotFoundError: # for brand-new deployment
             match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
         else:
             last_match = last_updated[0]["_source"]["matchId"]
