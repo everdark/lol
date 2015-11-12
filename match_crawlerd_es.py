@@ -55,7 +55,10 @@ def main():
                     "updatetime": {
                         "properties": {
                             "matchId" : {"type": "string"},
-                            "date":     {"type": "date"}
+                            "date":     {
+                                "type":   "date",
+                                "format": "epoch_second"
+                                }
                             }
                         }
                     }
