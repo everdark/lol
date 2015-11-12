@@ -44,16 +44,21 @@ def main():
         es_port = config.get("elasticsearch", "port")
         es = elasticsearch.Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
 
-        try:
-            last_updated = es.search("match", "updatetime", size=1, sort="date:desc")["hits"]["hits"]
-        except elasticsearch.NotFoundError: # for brand-new deployment
+        if not es.indices.exists("match"):
+            settings = {
+                "settings" : {
+                    "number_of_shards": 1,
+                    "number_of_replicas": 0
+                }
+            }
+            es.indices.create(index="match", body=settings)
+
+        last_updated = es.search("match", "updatetime", size=1, sort="date:desc")["hits"]["hits"]
+        if not len(last_updated):
             match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
         else:
-            if not len(last_updated):
-                match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
-            else:
-                last_match = last_updated[0]["_source"]["matchId"]
-                match_id = increaseId(last_match)
+            last_match = last_updated[0]["_source"]["matchId"]
+            match_id = increaseId(last_match)
 
         while True:
             # crawl the match data
