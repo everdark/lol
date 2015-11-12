@@ -4,7 +4,7 @@ api_key = "5c03763b-2119-446c-a699-787d2e248283"
 region = "kr"
 summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
 #get summoner id by summoner name
-summonerId_list = getSummonerIdList(region, api_key, summonerNamesList)
+summonerId_list = getSummonerIdList(region, api_key, summoner_names_list)
 #get summoner's recent match info by summoner id
 recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list)
 #get most recent match
@@ -34,9 +34,7 @@ def getRecentMatchInfo(region, api_key, summonerId):
     r = requests.get(api_call, params=qs) 
     if r.status_code == 200:
         rj = r.json()
-        #createDate = rj.get('games')[0].get('gameId')  #also need createDate
         match_id_dict = dict(gameId = rj.get('games')[0].get('gameId'), createDate = rj.get('games')[0].get('createDate'))
-        #print "match_id_dict:",match_id_dict
         return match_id_dict
     else:
         return None
