@@ -1,3 +1,15 @@
+import requests
+
+api_key = "5c03763b-2119-446c-a699-787d2e248283"                                                         
+region = "kr"
+summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
+#get summoner id by summoner name
+summonerId_list = getSummonerIdList(region, api_key, summonerNamesList)
+#get summoner's recent match info by summoner id
+recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list)
+#get most recent match
+print "recentMatch=",getMostRecentMatchId(recent_match_info)
+
 def getSummonerId(region, api_key, summonerNames):
     api_server = "https://kr.api.pvp.net" 
     api_call = "%s/api/lol/%s/v1.4/summoner/by-name/%s" % (api_server, region, summonerNames)
@@ -54,19 +66,3 @@ def getMostRecentMatchId(recentMatchIdList):
             else:
                 pass   
     return recentMatch[most_recent].get('gameId')
-
-import requests
-
-api_key = "5c03763b-2119-446c-a699-787d2e248283"                                                         
-region = "kr"
-
-summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
-
-#get summoner id by summoner name
-summonerId_list = getSummonerIdList(region, api_key, summonerNamesList)
-
-#get summoner's recent match info by summoner id
-recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list)
-
-#get most recent match
-print "recentMatch=",getMostRecentMatchId(recent_match_info)
