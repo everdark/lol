@@ -67,12 +67,12 @@ def getMostRecentMatchId(recentMatchIdList):
 # test
 api_key = config.get("user", "api_key")
 region = "kr"
-summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
-#get summoner id by summoner name
-summonerId_list = getSummonerIdList(region, api_key, summoner_names_list)
-#get summoner's recent match info by summoner id
-recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list)
-#get most recent match
-print "recentMatch=",getMostRecentMatchId(recent_match_info)
 
+def main(summonerNameList):
+    summonerId_list = getSummonerIdList(region, api_key, summonerNameList) #get summoner id by summoner name
+    recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list) #get recent match info by summoner id
+    return getMostRecentMatchId(recent_match_info)
+
+summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
+print main(summoner_names_list)
 
