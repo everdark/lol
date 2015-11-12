@@ -1,6 +1,12 @@
+import ConfigParser
 import requests
 
-api_key = "5c03763b-2119-446c-a699-787d2e248283"                                                         
+config = ConfigParser.ConfigParser()
+if not len(config.read(['conf.ini'])):
+    print "No config file found. Program aborted."
+    exit(1)
+
+api_key = config.get("user", "api_key")
 region = "kr"
 summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
 #get summoner id by summoner name
