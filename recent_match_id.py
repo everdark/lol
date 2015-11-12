@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import ConfigParser
 import requests
 
@@ -5,16 +7,6 @@ config = ConfigParser.ConfigParser()
 if not len(config.read(['conf.ini'])):
     print "No config file found. Program aborted."
     exit(1)
-
-api_key = config.get("user", "api_key")
-region = "kr"
-summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
-#get summoner id by summoner name
-summonerId_list = getSummonerIdList(region, api_key, summoner_names_list)
-#get summoner's recent match info by summoner id
-recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list)
-#get most recent match
-print "recentMatch=",getMostRecentMatchId(recent_match_info)
 
 def getSummonerId(region, api_key, summonerNames):
     api_server = "https://kr.api.pvp.net" 
@@ -70,3 +62,17 @@ def getMostRecentMatchId(recentMatchIdList):
             else:
                 pass   
     return recentMatch[most_recent].get('gameId')
+
+
+# test
+api_key = config.get("user", "api_key")
+region = "kr"
+summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
+#get summoner id by summoner name
+summonerId_list = getSummonerIdList(region, api_key, summoner_names_list)
+#get summoner's recent match info by summoner id
+recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list)
+#get most recent match
+print "recentMatch=",getMostRecentMatchId(recent_match_info)
+
+
