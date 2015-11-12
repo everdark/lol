@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import os
 import traceback
 import ConfigParser
 import requests
@@ -46,11 +47,19 @@ def main():
 
         if not es.indices.exists("match"):
             settings = {
-                "settings" : {
+                "settings": {
                     "number_of_shards": 1,
                     "number_of_replicas": 0
+                    },
+                "mappings": {
+                    "updatetime": {
+                        "properties": {
+                            "matchId" : {"type": "string"},
+                            "date":     {"type": "date"}
+                            }
+                        }
+                    }
                 }
-            }
             es.indices.create(index="match", body=settings)
 
         last_updated = es.search("match", "updatetime", size=1, sort="date:desc")["hits"]["hits"]
