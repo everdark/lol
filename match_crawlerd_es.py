@@ -38,7 +38,7 @@ def increaseId(match_id, inc=1):
 
 def main():
     config = ConfigParser.ConfigParser()
-    if len(config.read(['/home/pi/lol/conf.ini'])):
+    if len(config.read(['conf.ini'])):
         region = "kr"
         api_key = config.get("user", "api_key")
         es_host = config.get("elasticsearch", "host")
@@ -83,11 +83,11 @@ def main():
         exit(1)
 
 def runAsDaemon():
-    with daemon.DaemonContext():
+    with daemon.DaemonContext(working_directory="."):
         try:
             main()
         except:
-            f = open("/home/pi/lol/log", 'w')
+            f = open("log", 'w')
             f.write(traceback.format_exc())
 
 if __name__ == "__main__":
