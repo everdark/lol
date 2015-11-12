@@ -8,9 +8,9 @@ if not len(config.read(['conf.ini'])):
     print "No config file found. Program aborted."
     exit(1)
 
-def getSummonerId(region, api_key, summonerNames):
+def getSummonerId(region, api_key, summonerNames, ver='v1.4'):
     api_server = "https://kr.api.pvp.net" 
-    api_call = "%s/api/lol/%s/v1.4/summoner/by-name/%s" % (api_server, region, summonerNames)
+    api_call = "%s/api/lol/%s/%s/summoner/by-name/%s" % (api_server, region, ver, summonerNames)
     qs = {"api_key": api_key,                                                                           
           "locale": "en_US",                                                                              
           "itemListData": "all"} 
@@ -23,9 +23,9 @@ def getSummonerId(region, api_key, summonerNames):
     else:
         return None
         
-def getRecentMatchInfo(region, api_key, summonerId):
+def getRecentMatchInfo(region, api_key, summonerId, ver='v1.3'):
     api_server = "https://kr.api.pvp.net" 
-    api_call = "%s/api/lol/%s/v1.3/game/by-summoner/%s/recent" % (api_server, region, summonerId)
+    api_call = "%s/api/lol/%s/%s/game/by-summoner/%s/recent" % (api_server, region, ver, summonerId)
     qs = {"api_key": api_key,                                                                           
           "locale": "en_US",                                                                              
           "itemListData": "all"} 
@@ -53,26 +53,23 @@ def getRecentMatchInfoList(region, api_key, summonerIdList):
 
 def getMostRecentMatchId(recentMatchIdList):
     most_recent = 0
-    for s,t in enumerate(recentMatch):
+    for s,t in enumerate(recentMatchIdList):
         if(s==0):
             break
         else:
-            if(recentMatch[s].get('createDate') > recentMatch[s-1].get('createDate')):
+            if(recentMatchIdList[s].get('createDate') > recentMatchIdList[s-1].get('createDate')):
                 most_recent = s
             else:
                 pass   
-    return recentMatch[most_recent].get('gameId')
-
+    return recentMatchIdList[most_recent].get('gameId')
 
 # test
-api_key = config.get("user", "api_key")
-region = "kr"
-
 def main(summonerNameList):
+    api_key = config.get("user", "api_key")
+    region = "kr"
     summonerId_list = getSummonerIdList(region, api_key, summonerNameList) #get summoner id by summoner name
     recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list) #get recent match info by summoner id
     return getMostRecentMatchId(recent_match_info)
 
 summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
 print main(summoner_names_list)
-
