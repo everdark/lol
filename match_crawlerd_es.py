@@ -49,10 +49,10 @@ def main():
         except elasticsearch.NotFoundError: # for brand-new deployment
             match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
         else:
-            last_match = last_updated[0]["_source"]["matchId"]
-            if not len(last_match):
+            if not len(last_updated):
                 match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
             else:
+                last_match = last_updated[0]["_source"]["matchId"]
                 match_id = increaseId(last_match)
 
         while True:
