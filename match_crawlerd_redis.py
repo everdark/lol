@@ -43,8 +43,8 @@ def main():
     config = ConfigParser.ConfigParser()
     if len(config.read(['/home/pi/lol/conf.ini'])):
         api_key = config.get("user", "api_key")
-        redis_host = config.get("redis", "host")
-        redis_port = config.get("redis", "port")
+        redis_host = config.get("database", "redis_host")
+        redis_port = config.get("database", "redis_port")
         redis = setRedisConn(host=redis_host, port=redis_port)
         last_match = redis.lindex("last100", 0)
         if last_match is None: # for brand-new database
