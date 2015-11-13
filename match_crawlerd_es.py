@@ -5,7 +5,7 @@ import time
 import logging
 import traceback
 import daemon
-import configparser
+import ConfigParser
 import requests
 import elasticsearch
 
@@ -38,7 +38,7 @@ def increaseId(match_id, inc=1):
     return next_match_id
 
 def main():
-    config = configparser.ConfigParser()
+    config = ConfigParser.ConfigParser()
     if len(config.read(['conf.ini'])):
         api_key = config.get("user", "api_key")
         region = config.get("user", "region")
