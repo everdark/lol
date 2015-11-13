@@ -39,8 +39,8 @@ def main():
     config = ConfigParser.ConfigParser()
     if len(config.read(['/home/pi/lol/conf.ini'])):
         api_key = config.get("user", "api_key")
-        mongo_host = config.get("mongo", "host")
-        mongo_port = config.get("mongo", "port")
+        mongo_host = config.get("database", "mongodb_host")
+        mongo_port = config.get("database", "mongodb_port")
         mongo = MongoClient(host=mongo_host, port=mongo_port)
         last_match = mongo.AllMatchId.find_one(sort=[("_id", -1)])
         if last_match is None: # for brand-new database
