@@ -54,7 +54,10 @@ def main():
                 "mappings": {
                     "updatetime": {
                         "properties": {
-                            "matchId" : {"type": "string"},
+                            "matchId" : {
+                                "type":  "string",
+                                "index": "not_analyzed"
+                                },
                             "date":     {
                                 "type":   "date",
                                 "format": "epoch_second"
