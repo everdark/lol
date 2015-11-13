@@ -40,11 +40,12 @@ def increaseId(match_id, inc=1):
 def main():
     config = ConfigParser.ConfigParser()
     if len(config.read(['conf.ini'])):
-        logging.basicConfig(filename='crawld.log',level=logging.INFO, format='[%(asctime)s] %(message)s')
-        region = "kr"
         api_key = config.get("user", "api_key")
-        es_host = config.get("elasticsearch", "host")
-        es_port = config.get("elasticsearch", "port")
+        region = config.get("user", "kr")
+        log_path = config.get("logging", "log_path")
+        logging.basicConfig(filename=log_path,level=logging.INFO, format='[%(asctime)s] %(message)s')
+        es_host = config.get("database", "elasticsearch_host")
+        es_port = config.get("database", "elasticsearch_port")
         es = elasticsearch.Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
 
         if not es.indices.exists("match"):
