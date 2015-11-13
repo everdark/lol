@@ -3,11 +3,6 @@
 import ConfigParser
 import requests
 
-config = ConfigParser.ConfigParser()
-if not len(config.read(['conf.ini'])):
-    print "No config file found. Program aborted."
-    exit(1)
-
 def getSummonerId(region, api_key, summonerNames, ver='v1.4'):
     api_server = "https://kr.api.pvp.net" 
     api_call = "%s/api/lol/%s/%s/summoner/by-name/%s" % (api_server, region, ver, summonerNames)
@@ -36,7 +31,11 @@ def getRecentMatchInfo(region, api_key, summonerId, ver='v1.3'):
         return match_id_dict
     else:
         return None
-        
+
+def getRecentMatchBySummonerName(region, api_key, summoner_name):
+    summoner_id = getSummonerId(region=region, api_key=api_key, summonerNames=summoner_name, ver="v1.4")
+    return getRecentMatchInfo(region=region, api_key=api_key, summonerId=summoner_id, ver="v1.3")
+
 #need error handle if summonerName is invalid
 def getSummonerIdList(region, api_key, summonerNamesList):
     summoner_id_list =[]
@@ -65,6 +64,10 @@ def getMostRecentMatchId(recentMatchIdList):
 
 # test
 def main(summonerNameList):
+    config = ConfigParser.ConfigParser()
+    if not len(config.read(['conf.ini'])):
+        print "No config file found. Program aborted."
+        exit(1)
     api_key = config.get("user", "api_key")
     region = "kr"
     summonerId_list = getSummonerIdList(region, api_key, summonerNameList) #get summoner id by summoner name
