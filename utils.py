@@ -71,5 +71,6 @@ def main(summonerNameList):
     recent_match_info = getRecentMatchInfoList(region, api_key, summonerId_list) #get recent match info by summoner id
     return getMostRecentMatchId(recent_match_info)
 
-summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
-print main(summoner_names_list)
+if __name__ == "__main__":
+    summoner_names_list = ['hide on bush', 'dopa', 'SKT T1 Scout']
+    print main(summoner_names_list)
