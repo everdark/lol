@@ -41,7 +41,7 @@ def main():
     config = ConfigParser.ConfigParser()
     if len(config.read(['conf.ini'])):
         api_key = config.get("user", "api_key")
-        region = config.get("user", "kr")
+        region = config.get("user", "region")
         log_path = config.get("logging", "log_path")
         logging.basicConfig(filename=log_path,level=logging.INFO, format='[%(asctime)s] %(message)s')
         es_host = config.get("database", "elasticsearch_host")
@@ -68,6 +68,14 @@ def main():
                             "createTime": {
                                 "type":   "date",
                                 "format": "epoch_second"
+                                }
+                            }
+                        },
+                    "details" : {
+                        "properties": {
+                            "matchCreation": {
+                                "type":   "date",
+                                "format": "epoch_millis"
                                 }
                             }
                         }
