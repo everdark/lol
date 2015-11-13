@@ -89,6 +89,7 @@ def runAsDaemon():
         except:
             f = open("/home/pi/lol/log", 'w')
             f.write(traceback.format_exc())
+            f.close()
 
 if __name__ == "__main__":
     runAsDaemon()
