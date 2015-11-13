@@ -1,12 +1,13 @@
 #!/usr/bin/env python
 
 import os
+import time
+import logging
 import traceback
+import daemon
 import ConfigParser
 import requests
-import daemon
 import elasticsearch
-import time
 
 def getLastMatch(region, seed_pid, api_key, ver="v1.3"):
     api_server = "https://%s.api.pvp.net" % region
@@ -28,9 +29,9 @@ def getMatchDetails(region, match_id, api_key, ver="v2.2"):
     r = requests.get(api_call, params=qs)
     if r.status_code == 200:
         rj = r.json()
-        return rj
+        return r.status_code, rj
     else:
-        return None
+        return r.status_code, None
 
 def increaseId(match_id, inc=1):
     next_match_id = str(int(match_id) + inc)
@@ -39,6 +40,7 @@ def increaseId(match_id, inc=1):
 def main():
     config = ConfigParser.ConfigParser()
     if len(config.read(['conf.ini'])):
+        logging.basicConfig(filename='crawld.log',level=logging.INFO, format='[%(asctime)s] %(message)s')
         region = "kr"
         api_key = config.get("user", "api_key")
         es_host = config.get("elasticsearch", "host")
@@ -52,13 +54,17 @@ def main():
                     "number_of_replicas": 0
                     },
                 "mappings": {
-                    "updatetime": {
+                    "timeinfo": {
                         "properties": {
                             "matchId" : {
                                 "type":  "string",
                                 "index": "not_analyzed"
                                 },
-                            "date":     {
+                            "insertTime": {
+                                "type":   "date",
+                                "format": "epoch_second"
+                                },
+                            "createTime": {
                                 "type":   "date",
                                 "format": "epoch_second"
                                 }
@@ -68,7 +74,7 @@ def main():
                 }
             es.indices.create(index="match", body=settings)
 
-        last_updated = es.search("match", "updatetime", size=1, sort="date:desc")["hits"]["hits"]
+        last_updated = es.search("match", "timeinfo", size=1, sort="insertTime:desc")["hits"]["hits"]
         if not len(last_updated):
             match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
         else:
@@ -77,10 +83,14 @@ def main():
 
         while True:
             # crawl the match data
-            match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
+            status_code, match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
+            logging.info("crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
             if match_details is not None:
                 mid = match_details.pop("matchId") # replace the default es _id
-                es.create("match", "updatetime", body={"matchId": mid, "date": int(time.time())} )
+                es.create("match", "timeinfo", body={
+                    "matchId": mid, 
+                    "insertTime": int(time.time()), 
+                    "createTime": match_details["matchCreation"] / 1000} )
                 es.create("match", "details", id=mid, body=match_details)
             match_id = increaseId(match_id)    
             time.sleep(1) # to avoid api overshooting (max 500 queries per 10 min)
@@ -93,7 +103,7 @@ def runAsDaemon():
         try:
             main()
         except:
-            f = open("log", 'w')
+            f = open("debug.log", 'w')
             f.write(traceback.format_exc())
 
 if __name__ == "__main__":
