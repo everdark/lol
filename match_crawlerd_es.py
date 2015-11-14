@@ -3,11 +3,20 @@
 import os
 import time
 import logging
+from logging.handlers import RotatingFileHandler
 import traceback
 import daemon
 import ConfigParser
 import requests
 import elasticsearch
+
+def getLogger(log_path, level=logging.INFO):
+    logger = logging.getLogger("Rotating Log")
+    logger.setLevel(level)
+    fhandler = RotatingFileHandler(log_path, maxBytes=1024*10, backupCount=5)
+    fhandler.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
+    logger.addHandler(fhandler)
+    return logger
 
 def getLastMatch(region, seed_pid, api_key, ver="v1.3"):
     api_server = "https://%s.api.pvp.net" % region
@@ -43,7 +52,7 @@ def main():
         api_key = config.get("user", "api_key")
         region = config.get("user", "region")
         log_path = config.get("logging", "log_path")
-        logging.basicConfig(filename=log_path,level=logging.INFO, format='[%(asctime)s] %(message)s')
+        logger = getLogger(log_path, level=logging.INFO)
         es_host = config.get("database", "elasticsearch_host")
         es_port = config.get("database", "elasticsearch_port")
         es = elasticsearch.Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
@@ -93,7 +102,7 @@ def main():
         while True:
             # crawl the match data
             status_code, match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
-            logging.info("crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
+            logger.info("crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
             if match_details is not None:
                 mid = match_details.pop("matchId") # replace the default es _id
                 es.create("match", "timeinfo", body={
