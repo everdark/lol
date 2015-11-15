@@ -81,6 +81,15 @@ def main():
                             }
                         },
                     "details" : {
+                        "dynamic_templates": [
+                            { "default_string_mapping": {
+                                "match_mapping_type": "string",
+                                "mapping": {
+                                    "type":  "string",
+                                    "index": "not_analyzed"
+                                    }
+                                }}
+                            ]
                         "properties": {
                             "matchCreation": {
                                 "type":   "date",
