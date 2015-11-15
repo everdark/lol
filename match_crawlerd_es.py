@@ -13,7 +13,7 @@ import elasticsearch
 def getLogger(log_path, level=logging.INFO):
     logger = logging.getLogger("Rotating Log")
     logger.setLevel(level)
-    fhandler = RotatingFileHandler(log_path, maxBytes=1024*10, backupCount=5)
+    fhandler = RotatingFileHandler(log_path, maxBytes=1024*1024*10, backupCount=5)
     fhandler.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
     logger.addHandler(fhandler)
     return logger
