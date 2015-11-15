@@ -89,7 +89,7 @@ def main():
                                     "index": "not_analyzed"
                                     }
                                 }}
-                            ]
+                            ],
                         "properties": {
                             "matchCreation": {
                                 "type":   "date",
@@ -100,11 +100,11 @@ def main():
                     }
                 }
             es.indices.create(index="match", body=settings)
-            match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
+            match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
         else:
             last_updated = es.search("match", "timeinfo", size=1, sort="insertTime:desc")["hits"]["hits"]
             if not len(last_updated):
-                match_id = getLastMatch(region, seed_pid="4460427", api_key=api_key)
+                match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
             else:
                 last_match = last_updated[0]["_source"]["matchId"]
                 match_id = increaseId(last_match)
