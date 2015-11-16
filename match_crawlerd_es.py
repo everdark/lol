@@ -46,6 +46,50 @@ def increaseId(match_id, inc=1):
     next_match_id = str(int(match_id) + inc)
     return next_match_id
 
+def initElasticIndices(es, index_name):
+    settings = {
+        "settings": {
+            "number_of_shards": 1,
+            "number_of_replicas": 0
+            },
+        "mappings": {
+            "timeinfo": {
+                "properties": {
+                    "matchId" : {
+                        "type":  "string",
+                        "index": "not_analyzed"
+                        },
+                    "insertTime": {
+                        "type":   "date",
+                        "format": "epoch_second"
+                        },
+                    "createTime": {
+                        "type":   "date",
+                        "format": "epoch_second"
+                        }
+                    }
+                },
+            "details" : {
+                "dynamic_templates": [
+                    { "default_string_mapping": {
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type":  "string",
+                            "index": "not_analyzed"
+                            }
+                        }}
+                    ],
+                "properties": {
+                    "matchCreation": {
+                        "type":   "date",
+                        "format": "epoch_millis"
+                        }
+                    }
+                }
+            }
+        }
+    return es.indices.create(index=index_name, body=settings)
+
 def main():
     config = ConfigParser.ConfigParser()
     if len(config.read(['conf.ini'])):
@@ -58,48 +102,7 @@ def main():
         es = elasticsearch.Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
 
         if not es.indices.exists("match"):
-            settings = {
-                "settings": {
-                    "number_of_shards": 1,
-                    "number_of_replicas": 0
-                    },
-                "mappings": {
-                    "timeinfo": {
-                        "properties": {
-                            "matchId" : {
-                                "type":  "string",
-                                "index": "not_analyzed"
-                                },
-                            "insertTime": {
-                                "type":   "date",
-                                "format": "epoch_second"
-                                },
-                            "createTime": {
-                                "type":   "date",
-                                "format": "epoch_second"
-                                }
-                            }
-                        },
-                    "details" : {
-                        "dynamic_templates": [
-                            { "default_string_mapping": {
-                                "match_mapping_type": "string",
-                                "mapping": {
-                                    "type":  "string",
-                                    "index": "not_analyzed"
-                                    }
-                                }}
-                            ],
-                        "properties": {
-                            "matchCreation": {
-                                "type":   "date",
-                                "format": "epoch_millis"
-                                }
-                            }
-                        }
-                    }
-                }
-            es.indices.create(index="match", body=settings)
+            initElasticIndices(es=es, index_name="match")
             match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
         else:
             last_updated = es.search("match", "timeinfo", size=1, sort="insertTime:desc")["hits"]["hits"]
