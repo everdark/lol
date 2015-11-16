@@ -10,6 +10,8 @@ import ConfigParser
 import requests
 import elasticsearch
 
+import dbtools
+
 def getLogger(log_path, level=logging.INFO):
     logger = logging.getLogger("Rotating Log")
     logger.setLevel(level)
@@ -46,50 +48,6 @@ def increaseId(match_id, inc=1):
     next_match_id = str(int(match_id) + inc)
     return next_match_id
 
-def initElasticIndices(es, index_name):
-    settings = {
-        "settings": {
-            "number_of_shards": 1,
-            "number_of_replicas": 0
-            },
-        "mappings": {
-            "timeinfo": {
-                "properties": {
-                    "matchId" : {
-                        "type":  "string",
-                        "index": "not_analyzed"
-                        },
-                    "insertTime": {
-                        "type":   "date",
-                        "format": "epoch_second"
-                        },
-                    "createTime": {
-                        "type":   "date",
-                        "format": "epoch_second"
-                        }
-                    }
-                },
-            "details" : {
-                "dynamic_templates": [
-                    { "default_string_mapping": {
-                        "match_mapping_type": "string",
-                        "mapping": {
-                            "type":  "string",
-                            "index": "not_analyzed"
-                            }
-                        }}
-                    ],
-                "properties": {
-                    "matchCreation": {
-                        "type":   "date",
-                        "format": "epoch_millis"
-                        }
-                    }
-                }
-            }
-        }
-    return es.indices.create(index=index_name, body=settings)
-
 def main():
     config = ConfigParser.ConfigParser()
     if len(config.read(['conf.ini'])):
@@ -102,14 +60,14 @@ def main():
         es = elasticsearch.Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
 
         if not es.indices.exists("match"):
-            initElasticIndices(es=es, index_name="match")
+            dbtools.initElasticIndices(es)
             match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
         else:
-            last_updated = es.search("match", "timeinfo", size=1, sort="insertTime:desc")["hits"]["hits"]
+            last_updated = es.search("match", "brief", size=1, sort="insertTime:desc")["hits"]["hits"]
             if not len(last_updated):
                 match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
             else:
-                last_match = last_updated[0]["_source"]["matchId"]
+                last_match = last_updated[0]["_id"]
                 match_id = increaseId(last_match)
 
         while True:
@@ -117,11 +75,7 @@ def main():
             status_code, match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
             logger.info("crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
             if match_details is not None:
-                mid = match_details.pop("matchId") # replace the default es _id
-                es.create("match", "timeinfo", body={
-                    "matchId": mid, 
-                    "insertTime": int(time.time()), 
-                    "createTime": match_details["matchCreation"] / 1000} )
+                mid = match_details.pop("matchId") # replace the default auto-index field _id
                 es.create("match", "details", id=mid, body=match_details)
             match_id = increaseId(match_id)    
             time.sleep(1) # to avoid api overshooting (max 500 queries per 10 min)
