@@ -12,6 +12,8 @@ mongodb_host = localhost
 mongodb_port = 27019
 elasticsearch_host = localhost
 elasticsearch_port = 9200
+elasticsearch_index = match
+elasticsearch_doctype = details
 
 [seed]
 player = player_name_1,player_name_2
