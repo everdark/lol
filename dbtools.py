@@ -1,12 +1,12 @@
 
-def initElasticIndices(es, index_name="match"):
+def initElasticIndices(es, index_name="match", doc_type="details"):
     index_settings = {
         "settings": {
             "number_of_shards": 1,
             "number_of_replicas": 0
             }, 
         "mappings": {
-            "details": {
+            doc_type: {
                 "dynamic_templates": [
                     { "default_string_mapping": {
                         "match_mapping_type": "string",
@@ -18,7 +18,7 @@ def initElasticIndices(es, index_name="match"):
                     { "default_object_mapping": {
                         "match_mapping_type": "object",
                         "mapping": {
-                            "type": "nested"
+                            "type": "object"
                             }
                         }}
                     ],
@@ -59,39 +59,49 @@ def initElasticIndices(es, index_name="match"):
                         "type": "string"
                         },
                     "participantIdentities": {
-                        "type": "nested"
+                        "type": "nested",
+                        "properties": {
+                            "player":        {"type": "nested"},
+                            "participantId": {"type": "long"}
+                            }
                         },
                     "participants": {
-                        "type": "nested"
+                        "type": "object"
                         },
                     "teams": {
-                        "type": "nested"
+                        "type": "object"
                         },
                     "timeline": {
-                        "type": "nested"
+                        "type": "object"
                         }
                     }
                 }
             },
-            # soure filtering in alias is NOT working
         "aliases": {
-            "brief": {
-                "_source": [ "matchCreation", 
-                            "matchDuration", 
-                            "matchMode",
-                            "matchType",
-                            "matchVersion",
-                            "queueType",
-                            "mapId",
-                            "season",
-                            "region",
-                            "platformId"]
+            "%s_solorank" % index_name: {
+                "filter": {
+                    "term": {
+                        "queueType": "RANKED_SOLO_5x5"
+                        }
+                    } 
+                },
+            "%s_normalgame" % index_name: {
+                "filter": {
+                    "term": {
+                        "queueType": "NORMAL_5x5_BLIND"
+                        }
+                    }
+                },
+            "%s_aram" % index_name: {
+                "filter": {
+                    "term": {
+                        "queueType": "ARAM_5x5"
+                        }
+                    }
                 }
             }
         }
-    # alias_settings = {}
     es.indices.create(index=index_name, body=index_settings)
-    # es.indices.put_alias(index=index_name, name="brief", body=alias_settings)
     return None
 
 
