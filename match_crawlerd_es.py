@@ -62,19 +62,23 @@ def main():
 
         es = elasticsearch.Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
         if not es.indices.exists(es_index):
+            logger.info("Elastic index name %s not found. Create it." % es_index)
             dbtools.initElasticIndices(es, index_name=es_index, doc_type=es_doctype)
             match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
+            logger.info("Set matchId starting point to %s." % match_id)
         else:
             last_updated = es.search(es_index, es_doctype, _source=False, size=1, sort="insertTime:desc")["hits"]["hits"]
             if not len(last_updated):
                 match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
+                logger.info("Document not found. Set matchId starting point to %s." % match_id)
             else:
                 last_match = last_updated[0]["_id"]
                 match_id = increaseId(last_match)
+                logger.info("Latest matchId found to be %s. Start at %s" % (last_match, match_id))
 
         while True:
             status_code, match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
-            logger.info("crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
+            logger.info("Crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
             if match_details is not None:
                 mid = match_details.pop("matchId") # replace the default auto-index field _id
                 es.create(es_index, es_doctype, id=mid, body=match_details)
