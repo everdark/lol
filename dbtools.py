@@ -32,37 +32,44 @@ def initElasticIndices(es, index_name="match", doc_type="details"):
                         "format": "epoch_millis"
                         },
                     "matchDuration": {
-                        "type": "long"
+                        "type": "integer"
                         },
                     "matchMode": {
-                        "type": "string"
+                        "type": "string",
+                        "index": "not_analyzed"
                         },
                     "matchType": {
-                        "type": "string"
+                        "type": "string",
+                        "index": "not_analyzed"
                         },
                     "matchVersion": {
-                        "type": "string"
+                        "type": "string",
+                        "index": "not_analyzed"
                         },
                     "queueType": {
-                        "type": "string"
+                        "type": "string",
+                        "index": "not_analyzed"
                         },
                     "mapId": {
-                        "type": "long"
+                        "type": "integer"
                         },
                     "season": {
-                        "type": "string"
+                        "type": "string",
+                        "index": "not_analyzed"
                         },
                     "region": {
-                        "type": "string"
+                        "type": "string",
+                        "index": "not_analyzed"
                         },
                     "platformId": {
-                        "type": "string"
+                        "type": "string",
+                        "index": "not_analyzed"
                         },
                     "participantIdentities": {
                         "type": "nested",
                         "properties": {
                             "player":        {"type": "nested"},
-                            "participantId": {"type": "long"}
+                            "participantId": {"type": "integer"}
                             }
                         },
                     "participants": {
@@ -79,6 +86,7 @@ def initElasticIndices(es, index_name="match", doc_type="details"):
             },
         "aliases": {
             "%s_solorank" % index_name: {
+                "routing": "RANKED_SOLO_5x5",
                 "filter": {
                     "term": {
                         "queueType": "RANKED_SOLO_5x5"
@@ -86,6 +94,7 @@ def initElasticIndices(es, index_name="match", doc_type="details"):
                     } 
                 },
             "%s_normalgame" % index_name: {
+                "routing": "NORMAL_5x5_BLIND",
                 "filter": {
                     "term": {
                         "queueType": "NORMAL_5x5_BLIND"
@@ -93,6 +102,7 @@ def initElasticIndices(es, index_name="match", doc_type="details"):
                     }
                 },
             "%s_aram" % index_name: {
+                "routing": "ARAM_5x5",
                 "filter": {
                     "term": {
                         "queueType": "ARAM_5x5"
