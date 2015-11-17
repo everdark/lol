@@ -77,6 +77,7 @@ def main():
             logger.info("crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
             if match_details is not None:
                 mid = match_details.pop("matchId") # replace the default auto-index field _id
+                match_details["insertTime"] = int(time.time() * 1000)
                 es.create(es_index, es_doctype, id=mid, body=match_details)
             match_id = increaseId(match_id)    
             time.sleep(1) # to avoid api overshooting (max 500 queries per 10 min)
