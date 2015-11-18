@@ -3,7 +3,10 @@ api_key = <your key>
 region = <targeted api region>
 
 [logging]
-log_path = <path of log file>
+log_path = <path of log files>
+
+[dumping]
+dump_path = <path of dump files>
 
 [database]
 redis_host = localhost

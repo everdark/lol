@@ -5,6 +5,7 @@ import time
 import json
 import logging
 from logging.handlers import (RotatingFileHandler, TimedRotatingFileHandler)
+import subprocess
 import traceback
 import daemon
 import ConfigParser
@@ -62,11 +63,18 @@ def main():
         api_key = config.get("user", "api_key")
         region = config.get("user", "region")
         log_path = config.get("logging", "log_path")
+        dump_path = config.get("dumping", "dump_path")
         logger = getLogger(log_path, level=logging.INFO)
-        dumper = getDumper("testdumps", level=logging.INFO)
+        dumper = getDumper(dump_path, level=logging.INFO)
 
-        match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
-        logger.info("Set matchId starting point to %s." % match_id)
+        last_line = subprocess.check_output(["tail", "-n1", dump_path])
+        if last_line == '':
+            match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
+            logger.info("No previous dumped file found. Set matchId starting point to %s." % match_id)
+        else:
+            last_match = json.loads(last_line)["matchId"]
+            match_id = str(last_match + 1)
+            logger.info("Previous dumped file found. Set matchId continue at %s." % match_id)
 
         while True:
             status_code, match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
