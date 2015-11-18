@@ -24,7 +24,7 @@ def getLogger(log_path, level=logging.INFO):
 def getDumper(log_path, level=logging.INFO):
     logger = logging.getLogger("Rotating Dumpper")
     logger.setLevel(level)
-    fhandler = RotatingFileHandler(log_path, maxBytes=1024*1024*10, backupCount=5)
+    fhandler = TimedRotatingFileHandler(log_path, when='D', interval=1, backupCount=7)
     logger.addHandler(fhandler)
     return logger
 
