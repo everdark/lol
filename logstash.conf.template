@@ -1,0 +1,19 @@
+
+input {
+    file {
+        path => <dump json lines>
+        start_position => "beginning"
+        codec => json {}
+    }
+}
+
+output {
+    elasticsearch {
+        hosts => "localhost:9200"
+        index => "testdumps"
+        document_type => "details"
+        document_id => "%{matchId}"
+        manage_template => false
+    }
+    # stdout {}
+}
