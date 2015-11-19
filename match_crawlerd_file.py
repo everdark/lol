@@ -81,6 +81,7 @@ def main():
             logger.info("Crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
             if match_details is not None:
                 match_details["insertTime"] = int(time.time() * 1000)
+                # match_details["_id"] = match_details.pop("matchId")
                 dumper.info(json.dumps(match_details))
             match_id = increaseId(match_id)    
             time.sleep(1) # to avoid api overshooting (max 500 queries per 10 min)
