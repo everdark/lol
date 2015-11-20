@@ -2,6 +2,7 @@
 input {
     file {
         path => <dump json lines>
+        sincedb_path = <.sincedb file path>
         start_position => "beginning"
         codec => json {}
     }
