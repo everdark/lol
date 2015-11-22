@@ -4,6 +4,7 @@ input {
         path => <dump json lines>
         sincedb_path = <.sincedb file path>
         start_position => "beginning"
+        stat_intreval => 1
         codec => json {}
     }
 }
