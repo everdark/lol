@@ -6,6 +6,8 @@ This repo is in early beta and hence is highly dynamic.
 + ~~[Redis](http://redis.io)~~
 + ~~[mongoDB](https://www.mongodb.org)~~
 + [elasticsearch](https://www.elastic.co): The backend of the system.
++ [logstash](https://www.elastic.co/products/logstash)
++ [docker](https://www.docker.com)
 + [Python2.7](https://www.python.org/download/releases/2.7/): General purpose language chosen to implement the infrastructure.
 + Python modules
     + [`requests`](http://docs.python-requests.org/en/latest/)
