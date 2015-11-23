@@ -1,0 +1,28 @@
+FROM ubuntu:14.04
+
+RUN apt-get -y update && apt-get install -y \ 
+        wget \
+        unzip \
+        openjdk-7-jre-headless \
+&&  apt-get clean \
+&&  rm -rf /var/lib/apt/lists/*
+
+RUN wget -O /opt/elasticsearch.zip \
+        https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/zip/elasticsearch/2.0.0/elasticsearch-2.0.0.zip \
+&&  cd /opt \
+&&  unzip /opt/elasticsearch.zip \
+&&  rm -rf /opt/elasticsearch.zip \
+&&  useradd -M elastic \
+&&  echo "elastic:elastic" | chpasswd \
+&&  adduser elastic sudo \ 
+&&  chown -R elastic:elastic /opt/elasticsearch-2.0.0
+
+COPY config /opt/elasticsearch-2.0.0/config
+
+USER elastic
+
+EXPOSE 9200 9300
+
+CMD ["/opt/elasticsearch-2.0.0/bin/elasticsearch"]
+
+
