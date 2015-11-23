@@ -22,9 +22,9 @@ This repo is in early beta and hence is highly dynamic.
     + [`data.table`](https://github.com/Rdatatable/data.table)
 
 
-### docker
+### Docker
 
-+ Build the elasticsearch docker image
+To build the elasticsearch docker image:
 ```
 cd docker
 docker build -t elastic .
@@ -34,7 +34,7 @@ After that, the image can be run with:
 ```
 docker run -Pd elastic
 ```
-To test the elasitsearch on-the-fly, try `docker run -it elastic bash` and paly around within the container. 
+To test the elasitsearch on-the-fly, try `docker run -it elastic bash` and play around within the container. 
 The initial user `elastic` is a sudoer so you may want to `sudo su` with the default passwd "elastic" to switch to `root`.
 
 
