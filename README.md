@@ -20,3 +20,22 @@ This repo is in early beta and hence is highly dynamic.
     + [`elastic`](https://cran.r-project.org/package=elastic)
     + [`magrittr`](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html)
     + [`data.table`](https://github.com/Rdatatable/data.table)
+
+
+### docker
+
++ Build the elasticsearch docker image
+```
+cd docker
+docker build -t elastic .
+```
+You may want to edit the config files under `docker/config` in advance to meet your environment setup.
+After that, the image can be run with:
+```
+docker run -Pd elastic
+```
+To test the elasitsearch on-the-fly, try `docker run -it elastic bash` and paly around within the container. 
+The initial user `elastic` is a sudoer so you may want to `sudo su` with the default passwd "elastic" to switch to `root`.
+
+
+
