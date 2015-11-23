@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+es_host=10.0.1.4
+es_port=9200
+
+usage() {
+    echo ""
+    echo "Usage: $0 [option]"
+    echo ""
+    echo "Options:"
+    echo "  -c, --count [index]: count # of doc"
+    echo "  -i, --info         : print all available indices"
+    echo ""
+}
+
+[[ $# -eq 0 ]] && usage
+
+while [[ $# -ge 1 ]]
+do
+opt="$1"
+case $opt in
+    -c|--count)
+        index="$2"
+        curl $es_host:$es_port/$index/_count?pretty
+        shift
+        ;;
+    -i|--info)
+        curl $es_host:$es_port/_cat/indices?v
+        shift
+        ;;
+    *)
+        echo "Unknown option."
+        usage
+        ;;
+esac
+shift
+done
+
+
+
