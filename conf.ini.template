@@ -18,5 +18,8 @@ elasticsearch_port = 9200
 elasticsearch_index = match
 elasticsearch_doctype = details
 
+[static]
+champion_id = statics/champion_id.json
+
 [seed]
 player = player_name_1,player_name_2
