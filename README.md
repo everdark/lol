@@ -23,17 +23,19 @@ This repo is in early beta and hence is highly dynamic.
 
 
 ### Docker
-
-Build the base image (a minimal `ubnutu:14.04` with `openjdk`, `wget`, and `unzip` utilities) first:
++ The base image
+The elasticsearch and logstash image are built on top of the base image, 
+which in turn is built on a minimal `ubuntu:14.04` with utilities of `openjdk`, `wget`, and `unzip`.
+So build the base image first by:
 ```
 cd docker/base
 docker build -t baseimg .
 ```
-Then the other images can be built accordingly:
+
++ The elasticsearch image
+After base image was built, try:
 ```
 cd ../docker/elasticsearch && docker build -t elastic .
-cd ../docker/logstash && docker build -t logstash .
-cd ../docker/kibana && docker build -t kibana .
 ```
 You may want to edit any config file under `config` in advance to meet your environment setup.
 After that, the image can be run with, for example, the elasticsearch image:
@@ -44,6 +46,23 @@ To test the elasitsearch on-the-fly, try `docker run -it elastic bash` and play 
 The initial user `elastic` is a sudoer so you may want to `sudo su` with the default passwd "elastic" to switch to `root`.
 The other images have similar setup.
 For more details, see the `Dockerfile` in each folder.
+
++ The logstash image
+After base image was built, try:
+```
+cd ../docker/logstash && docker build -t logstash .
+```
+
++ The kibana image
+The kibana docker image is directly built from `ubuntu:14.04` so there is no need to build the base image in advance.
+Simply `cd docker/kibana && docker build -t kibana .` will do the job.
+You would possibly like to configure the file `config/kibana.yml` to meet your environment setup before the actual build.
+After image is built, to start the kibana server:
+```
+docker run -d --net=host kibana
+```
+Notice that `host` mode networking is used so the kibana ip will be bind to your docker host, with default port 5601.
+The default `bridge` mode tends to cause trouble in node.js so is avoided.
 
 
 
