@@ -24,18 +24,26 @@ This repo is in early beta and hence is highly dynamic.
 
 ### Docker
 
-To build the elasticsearch docker image:
+Build the base image (a minimal `ubnutu:14.04` with `openjdk`, `wget`, and `unzip` utilities) first:
 ```
-cd docker
-docker build -t elastic .
+cd docker/base
+docker build -t baseimg .
 ```
-You may want to edit the config files under `docker/config` in advance to meet your environment setup.
-After that, the image can be run with:
+Then the other images can be built accordingly:
+```
+cd ../docker/elasticsearch && docker build -t elastic .
+cd ../docker/logstash && docker build -t logstash .
+cd ../docker/kibana && docker build -t kibana .
+```
+You may want to edit any config file under `config` in advance to meet your environment setup.
+After that, the image can be run with, for example, the elasticsearch image:
 ```
 docker run -Pd elastic
 ```
 To test the elasitsearch on-the-fly, try `docker run -it elastic bash` and play around within the container. 
 The initial user `elastic` is a sudoer so you may want to `sudo su` with the default passwd "elastic" to switch to `root`.
+The other images have similar setup.
+For more details, see the `Dockerfile` in each folder.
 
 
 
