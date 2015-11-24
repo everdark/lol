@@ -23,7 +23,7 @@ This repo is in early beta and hence is highly dynamic.
 
 
 ### Docker
-+ The base image
+#### The base image
 The elasticsearch and logstash image are built on top of the base image, 
 which in turn is built on a minimal `ubuntu:14.04` with utilities of `openjdk`, `wget`, and `unzip`.
 So build the base image first by:
@@ -32,7 +32,7 @@ cd docker/base
 docker build -t baseimg .
 ```
 
-+ The elasticsearch image
+#### The elasticsearch image
 After base image was built, try:
 ```
 cd ../docker/elasticsearch && docker build -t elastic .
@@ -47,13 +47,13 @@ The initial user `elastic` is a sudoer so you may want to `sudo su` with the def
 The other images have similar setup.
 For more details, see the `Dockerfile` in each folder.
 
-+ The logstash image
+#### The logstash image
 After base image was built, try:
 ```
 cd ../docker/logstash && docker build -t logstash .
 ```
 
-+ The kibana image
+#### The kibana image
 The kibana docker image is directly built from `ubuntu:14.04` so there is no need to build the base image in advance.
 Simply `cd docker/kibana && docker build -t kibana .` will do the job.
 You would possibly like to configure the file `config/kibana.yml` to meet your environment setup before the actual build.
