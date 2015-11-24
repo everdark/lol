@@ -9,7 +9,7 @@ def main():
     config = ConfigParser.ConfigParser()
     if len(config.read(["conf.ini"])):
         api_key = config.get("user", "api_key")
-        crawlertool.getAllChampionInfo(api_key, region="na", ver="v1.2", outfile="champion_id.json")
+        crawlertool.getAllChampionInfo(api_key, region="na", ver="v1.2", outfile="statics/champion_id.json")
     else:
         print "File conf.ini not found. Program aborted."
         exit(1)
