@@ -70,11 +70,11 @@ getMatchByChampion <- function(champ, size=NULL) {
                     "match_all": {}
                 },
                 "filter": {
-                    "term" : { "participants.championId": %s }
+                    %s
                 }
             }
         }
-    }', champ)
+    }', term)
     res <-
         if ( is.null(size) ) {
             Search(index="match", type="details", body=query,
