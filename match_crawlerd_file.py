@@ -9,7 +9,7 @@ import ConfigParser
 import elasticsearch
 
 import dbtools
-import crawlertools
+from crawlertools import *
 
 
 def main():
@@ -30,30 +30,34 @@ def main():
             if not len(seed_players):
                 logger.error("No seed player names in config file. Cold-start failed.")
                 exit(1)
-            seed_pids = [ getSummonerIdByName(region, api_key, p, delay=1) 
-                          for p in config.get("seed", "player").split(',')]
-            valid_pids = [ p for p in seed_pids if p is not None ]
-            if not len(valid_pids):
-                logger.error("No available data for given seed player names. Cold-start failed.")
-                exit(1)
-            match_info_from_seeds = [ getLastMatchByPid(region, api_key, pid, delay=1) 
-                                      for pid in valid_pids ]
-            latest_match = max([m for m in match_info_from_seeds if m is not None], 
-                               key=lambda x:x[0])[1]
-            logger.info("Set matchId starting point to %s." % latest_match)
+            latest_match = getLatestMatchBySummonerNames(region, 
+                    seed_players.split(','), api_key, delay=1)
+            match_id = increaseId(last_match)
+            logger.info("Set matchId starting point to %s." % match_id)
         else:
             # resume the previous crawling job
             last_match = json.loads(last_line)["matchId"]
-            match_id = str(last_match + 1)
+            match_id = increaseId(last_match)
             logger.info("Previous dumped file found. Set matchId continue at %s." % match_id)
 
+        cnt = 0
         while True:
             status_code, match_details = getMatchDetails(region=region, api_key=api_key, match_id=match_id)
             logger.info("Crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
             if match_details is not None:
                 match_details["insertTime"] = int(time.time() * 1000)
                 dumper.info(json.dumps(match_details))
-            match_id = increaseId(match_id)    
+            match_id = increaseId(match_id)
+
+            cnt += 1
+            if cnt >= 10000: 
+                # jump to a recent game, if any
+                latest_match = getLatestMatchBySummonerNames(region, 
+                        seed_players.split(','), api_key, delay=1)
+                if int(latest_match) > int(match_id):
+                    match_id = latest_match
+                cnt = 0
+
             time.sleep(1) # to avoid api overshooting (max 500 queries per 10 min)
     else:
         print "File conf.ini not found. Program aborted."
