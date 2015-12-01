@@ -1,61 +1,16 @@
 #!/usr/bin/env python
 
-import os
 import time
 import json
-import logging
-from logging.handlers import (RotatingFileHandler, TimedRotatingFileHandler)
-import subprocess
-import traceback
 import daemon
+import traceback
+import subprocess
 import ConfigParser
-import requests
 import elasticsearch
 
 import dbtools
+import crawlertools
 
-def getLogger(log_path, level=logging.INFO):
-    logger = logging.getLogger("Rotating Logger")
-    logger.setLevel(level)
-    fhandler = RotatingFileHandler(log_path, maxBytes=1024*1024*10, backupCount=5)
-    fhandler.setFormatter(logging.Formatter("[%(asctime)s] %(message)s"))
-    logger.addHandler(fhandler)
-    return logger
-
-def getDumper(log_path, level=logging.INFO):
-    logger = logging.getLogger("Rotating Dumpper")
-    logger.setLevel(level)
-    fhandler = TimedRotatingFileHandler(log_path, when='H', interval=1, backupCount=24*7)
-    logger.addHandler(fhandler)
-    return logger
-
-def getLastMatch(region, seed_pid, api_key, ver="v1.3"):
-    api_server = "https://%s.api.pvp.net" % region
-    api_call = "%s/api/lol/%s/%s/game/by-summoner/%s/recent?" % (api_server, region, ver, seed_pid)
-    qs = {"api_key": api_key}
-    r = requests.get(api_call, params=qs)
-    if r.status_code == 200:
-        rj = r.json()
-        last_match = rj["games"][0]["gameId"]
-        return last_match
-    else:
-        return None
-
-def getMatchDetails(region, match_id, api_key, ver="v2.2"):
-    api_server = "https://%s.api.pvp.net" % region
-    api_call = "%s/api/lol/%s/%s/match/%s" % (api_server, region, ver, match_id)
-    qs = {"api_key": api_key,
-          "includeTimeline": "true"}
-    r = requests.get(api_call, params=qs)
-    if r.status_code == 200:
-        rj = r.json()
-        return r.status_code, rj
-    else:
-        return r.status_code, None
-
-def increaseId(match_id, inc=1):
-    next_match_id = str(int(match_id) + inc)
-    return next_match_id
 
 def main():
     config = ConfigParser.ConfigParser()
@@ -69,19 +24,34 @@ def main():
 
         last_line = subprocess.check_output(["tail", "-n1", dump_path])
         if last_line == '':
-            match_id = getLastMatch(region, seed_pid="22071749", api_key=api_key)
-            logger.info("No previous dumped file found. Set matchId starting point to %s." % match_id)
+            # cold-start
+            logger.info("No previous dumped file found. Do cold-start.")
+            seed_players = config.get("seed", "player")
+            if not len(seed_players):
+                logger.error("No seed player names in config file. Cold-start failed.")
+                exit(1)
+            seed_pids = [ getSummonerIdByName(region, api_key, p, delay=1) 
+                          for p in config.get("seed", "player").split(',')]
+            valid_pids = [ p for p in seed_pids if p is not None ]
+            if not len(valid_pids):
+                logger.error("No available data for given seed player names. Cold-start failed.")
+                exit(1)
+            match_info_from_seeds = [ getLastMatchByPid(region, api_key, pid, delay=1) 
+                                      for pid in valid_pids ]
+            latest_match = max([m for m in match_info_from_seeds if m is not None], 
+                               key=lambda x:x[0])[1]
+            logger.info("Set matchId starting point to %s." % latest_match)
         else:
+            # resume the previous crawling job
             last_match = json.loads(last_line)["matchId"]
             match_id = str(last_match + 1)
             logger.info("Previous dumped file found. Set matchId continue at %s." % match_id)
 
         while True:
-            status_code, match_details = getMatchDetails(region=region, match_id=match_id, api_key=api_key)
+            status_code, match_details = getMatchDetails(region=region, api_key=api_key, match_id=match_id)
             logger.info("Crawled possible matchId %s | status code resolved: %s" % (match_id, status_code))
             if match_details is not None:
                 match_details["insertTime"] = int(time.time() * 1000)
-                # match_details["_id"] = match_details.pop("matchId")
                 dumper.info(json.dumps(match_details))
             match_id = increaseId(match_id)    
             time.sleep(1) # to avoid api overshooting (max 500 queries per 10 min)
