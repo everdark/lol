@@ -1,6 +1,6 @@
 
 import time
-import logger
+import logging
 from logging.handlers import (RotatingFileHandler, TimedRotatingFileHandler)
 import requests
 import json
@@ -63,6 +63,20 @@ def getMatchDetails(region, match_id, api_key, ver="v2.2"):
         return r.status_code, rj
     else:
         return r.status_code, None
+
+def getLatestMatchBySummonerNames(region, pnames, api_key, delay=None):
+    seed_pids = [ getSummonerIdByName(region, api_key, p, delay=delay)
+                  for p in pnames ]
+    valid_pids = [ p for p in seed_pids if p is not None ]
+    if not len(valid_pids):
+        print "No available data for given seed player names."
+        return None
+    else:
+        match_info = [ getLastMatchByPid(region, api_key, pid, delay=delay)
+                       for pid in valid_pids ]
+        latest_match = max([m for m in match_info if m is not None],
+                           key=lambda x:x[0])[1]
+        return latest_match
 
 def getAllChampionInfo(api_key, region="na", ver="v1.2", outfile="champion_id.json"):
     api_server = "https://global.api.pvp.net" 
