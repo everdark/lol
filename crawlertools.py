@@ -76,7 +76,7 @@ def getLatestMatchBySummonerNames(region, pnames, api_key, delay=None):
                        for pid in valid_pids ]
         latest_match = max([m for m in match_info if m is not None],
                            key=lambda x:x[0])[1]
-        return latest_match
+        return str(latest_match)
 
 def getAllChampionInfo(api_key, region="na", ver="v1.2", outfile="champion_id.json"):
     api_server = "https://global.api.pvp.net" 
