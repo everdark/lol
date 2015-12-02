@@ -52,6 +52,7 @@ def main():
             cnt += 1
             if cnt >= 10000: 
                 # jump to a recent game, if any
+                seed_players = config.get("seed", "player")
                 latest_match = getLatestMatchBySummonerNames(region, 
                         seed_players.split(','), api_key, delay=1)
                 if int(latest_match) > int(match_id):
