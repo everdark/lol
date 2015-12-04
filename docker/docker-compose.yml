@@ -14,23 +14,31 @@ elastic:
     - "9200:9200"
   volumes:
     - /mnt/data/elasticsearch:/elastic_data
+  environment:
+    ES_HEAP_SIZE: 4g
 
 logstash:
   container_name: elk_logstash
   build: ./logstash
   volumes:
-    - /mnt/data/logstash:/logstash_data
+    - /mnt/data/logstash:/data
   entrypoint: ./entrypoint.sh
   command: ./bin/logstash -f ./config/logstash.conf
   links:
     - elastic
+  environment:
+    LS_HEAP_SIZE: 2g
 
 kibana:
   container_name: elk_kibana
-  build: ./kibana
+  # build: ./kibana
+  image: kibana:4.2.1
+  environment:
+    ELASTICSEARCH_URL: http://elastic:9200
   ports:
     - "5601:5601"
   links:
     - elastic
+
 
 
