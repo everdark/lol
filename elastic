@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-es_host=10.0.1.4
+#es_host=10.0.1.4
+es_host=127.0.0.1
 es_port=9200
 
 usage() {
