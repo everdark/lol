@@ -26,7 +26,7 @@ def main():
             if not len(seed_players):
                 logger.error("No seed player names in config file. Cold-start failed.")
                 exit(1)
-            latest_match = getLatestMatchBySummonerNames(region, 
+            last_match = getLatestMatchBySummonerNames(region, 
                     seed_players.split(','), api_key, delay=1)
             match_id = increaseId(last_match)
             logger.info("Set matchId starting point to %s." % match_id)
