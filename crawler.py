@@ -2,8 +2,6 @@
 
 import time
 import json
-import daemon
-import traceback
 import subprocess
 import ConfigParser
 
@@ -62,17 +60,8 @@ def main():
         print "File conf.ini not found. Program aborted."
         exit(1)
 
-def runAsDaemon():
-    with daemon.DaemonContext(working_directory='.'):
-        try:
-            main()
-        except:
-            f = open("debug.log", 'w')
-            f.write(traceback.format_exc())
-            f.close()
-
 if __name__ == "__main__":
-    runAsDaemon()
+    main()
 
 
 
