@@ -12,9 +12,11 @@ RUN wget -O /opt/logstash.zip \
 &&  chown -R logstash:logstash /opt/logstash-2.0.0
 
 COPY config /opt/logstash-2.0.0/config
+COPY entrypoint_create_index.sh /opt/logstash-2.0.0/entrypoint.sh
 
 USER logstash
 
-CMD ["/opt/logstash-2.0.0/bin/logstash", "-f", "/opt/logstash-2.0.0/config/logstash.conf"]
+WORKDIR /opt/logstash-2.0.0
+
 
 

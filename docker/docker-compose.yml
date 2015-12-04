@@ -1,0 +1,36 @@
+crawler:
+  container_name: elk_crawler
+  build: ./crawler
+  volumes:
+    - ..:/code
+    - /mnt/data/logstash:/data
+  working_dir: /code
+  command: python crawler.py
+
+elastic:
+  container_name: elk_elastic
+  build: ./elasticsearch
+  ports:
+    - "9200:9200"
+  volumes:
+    - /mnt/data/elasticsearch:/elastic_data
+
+logstash:
+  container_name: elk_logstash
+  build: ./logstash
+  volumes:
+    - /mnt/data/logstash:/logstash_data
+  entrypoint: ./entrypoint.sh
+  command: ./bin/logstash -f ./config/logstash.conf
+  links:
+    - elastic
+
+kibana:
+  container_name: elk_kibana
+  build: ./kibana
+  ports:
+    - "5601:5601"
+  links:
+    - elastic
+
+

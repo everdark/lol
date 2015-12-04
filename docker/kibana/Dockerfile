@@ -16,6 +16,8 @@ RUN cd /opt \
 
 COPY config /opt/kibana-4.2.1-linux-x64/config
 
+EXPOSE 5601
+
 USER kibana
 
 CMD ["/opt/kibana-4.2.1-linux-x64/bin/kibana"]

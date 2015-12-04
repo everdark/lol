@@ -2,14 +2,14 @@
 # server.port: 5601
 
 # The host to bind the server to.
-server.host: "10.0.1.4"
+server.host: "localhost"
 
 # A value to use as a XSRF token. This token is sent back to the server on each request
 # and required if you want to execute requests from other clients (like curl).
 # server.xsrf.token: ""
 
 # The Elasticsearch instance to use for all your queries.
-elasticsearch.url: "http://10.0.1.4:9200"
+elasticsearch.url: "http://elastic:9200"
 
 # preserve_elasticsearch_host true will send the hostname specified in `elasticsearch`. If you set it to false,
 # then the host you use to connect to *this* Kibana instance will be sent.

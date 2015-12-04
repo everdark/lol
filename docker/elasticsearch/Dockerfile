@@ -8,7 +8,9 @@ RUN wget -O /opt/elasticsearch.zip \
 &&  useradd -M elastic \
 &&  echo "elastic:elastic" | chpasswd \
 &&  adduser elastic sudo \ 
-&&  chown -R elastic:elastic /opt/elasticsearch-2.0.0
+&&  chown -R elastic:elastic /opt/elasticsearch-2.0.0 \
+&&  mkdir /elastic_data \
+&&  chown -R elastic:elastic /elastic_data
 
 COPY config /opt/elasticsearch-2.0.0/config
 
@@ -17,5 +19,6 @@ USER elastic
 EXPOSE 9200 9300
 
 CMD ["/opt/elasticsearch-2.0.0/bin/elasticsearch"]
+
 
 
