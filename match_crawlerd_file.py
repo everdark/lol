@@ -6,9 +6,7 @@ import daemon
 import traceback
 import subprocess
 import ConfigParser
-import elasticsearch
 
-import dbtools
 from crawlertools import *
 
 
