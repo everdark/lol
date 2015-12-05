@@ -3,6 +3,7 @@ This repo is in early beta and hence is highly dynamic.
 
 ### System dependencies
 
++ A valid [Riot Games API key](https://developer.riotgames.com/docs/getting-started)
 + ~~[Redis](http://redis.io)~~
 + ~~[mongoDB](https://www.mongodb.org)~~
 + The ELK stack
@@ -49,7 +50,7 @@ The `elastic` and `logstash` images are both built on top of the `baseimg`.
 
 #### `crawler`
 
-To run the crawler (written in python) against [RIOT API server](https://developer.riotgames.com/).
+To run the crawler (written in python) against [Riot Games API server](https://developer.riotgames.com/).
 Built on official [`python:2.7`](https://hub.docker.com/_/python/) image, 
 with modules mentioned in [System Dependencies](### System dependencies) all installed.
 The image will be auto built by `docker-compose up -d`. 
@@ -69,11 +70,11 @@ The image will be auto built by `docker-compose up -d`.
 The image of logstash installation.
 The image will be auto built by `docker-compose up -d`.
 
-The logstash container uses file input to insert data from file dumped by `crawler` in `/mnt/data/logstash`,
+The logstash container uses file input to insert data from files dumped by `crawler` in `/mnt/data/logstash`,
 to `elastic` container where the actuall index data will be stored at `/mnt/data/elasticsearch`.
 You can adjust the behavior of logstash by editing the file under `logstash/config`.
 
-When there is no index predefined (the ground-zero case) at `elastic`, 
+When there is no index pre-defined (the ground-zero case) at `elastic`, 
 the `logstash` image is also responsible to create one.
 See `/logstash/entrypoint_create_index.sh` for more details.
 
