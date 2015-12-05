@@ -78,16 +78,14 @@ def getLatestMatchBySummonerNames(region, pnames, api_key, delay=None):
                            key=lambda x:x[0])[1]
         return str(latest_match)
 
-def getAllChampionInfo(api_key, region="na", ver="v1.2", outfile="champion_id.json"):
+def getAllChampionInfo(api_key, region="na", ver="v1.2"):
     api_server = "https://global.api.pvp.net" 
     api_call = "%s/api/lol/static-data/%s/%s/champion" % (api_server, region, ver)
     qs = {"api_key": api_key}
     r = requests.get(api_call, params=qs)
     if r.status_code == 200:
         rj = r.json()
-        with open(outfile, 'w') as f:
-            for k, v in rj["data"].items():
-                f.write(json.dumps(v) + "\n")
+        return rj
     else:
         return None
 
