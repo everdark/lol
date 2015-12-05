@@ -7,7 +7,7 @@ import dbtools
 
 def main():
     config = ConfigParser.ConfigParser()
-    if len(config.read(["conf.ini"])):
+    if len(config.read(["config/conf.ini"])):
         es_host = "localhost"
         es_port = 9200
         es_index = "statics"

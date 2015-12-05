@@ -7,7 +7,7 @@ import dbtools
 
 def main():
     config = ConfigParser.ConfigParser()
-    if len(config.read(["conf.ini"])):
+    if len(config.read(["config/conf.ini"])):
         es_host = config.get("database", "elasticsearch_host")
         es_port = config.get("database", "elasticsearch_port")
         es_index = config.get("database", "elasticsearch_index")

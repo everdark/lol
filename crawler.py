@@ -10,7 +10,7 @@ from crawlertools import *
 
 def main():
     config = ConfigParser.ConfigParser()
-    if len(config.read(["conf.ini"])):
+    if len(config.read(["config/conf.ini"])):
         api_key = config.get("user", "api_key")
         region = config.get("user", "region")
         log_path = config.get("logging", "log_path")

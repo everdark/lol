@@ -8,7 +8,7 @@ import crawlertools
 
 def main():
     config = ConfigParser.ConfigParser()
-    if len(config.read(["conf.ini"])):
+    if len(config.read(["config/conf.ini"])):
         api_key = config.get("user", "api_key")
         outfile = config.get("static", "champion_id")
         res = crawlertools.getAllChampionInfo(api_key, region="na", ver="v1.2")
