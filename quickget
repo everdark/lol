@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+#es_host=10.0.1.4
+es_host=127.0.0.1
+es_port=9200
+
+usage() {
+    echo ""
+    echo "Usage: $0 <option>"
+    echo ""
+    echo "Options:"
+    echo "  -i, --item id   : get basic item info with given id"
+    echo "  -c, --champ id  : get basic champion info with given id"
+    echo ""
+}
+
+[[ $# -lt 2 ]] && {
+    usage
+    exit 1
+}
+
+opt="$1"
+id="$2"
+case $opt in
+    -i|--item)
+        curl $es_host:$es_port/statics/items/$id?pretty
+        ;;
+    -c|--champ)
+        curl $es_host:$es_port/statics/champs/$id?pretty
+        ;;
+    *)
+        echo "Unknown option."
+        usage
+        ;;
+esac
+
+
+
