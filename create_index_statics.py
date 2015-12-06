@@ -13,7 +13,7 @@ def main():
         es_index = "statics"
         es = elasticsearch.Elasticsearch(hosts=[{"host": es_host, "port": es_port}])
         if not es.indices.exists(es_index):
-            dbtools.initIndexOfStatics(es, index_name=es_index, doc_champ="champ")
+            dbtools.initIndexOfStatics(es, index_name=es_index)
         else:
             print "Index already exists. Do nothing."
             exit(0)

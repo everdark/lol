@@ -89,6 +89,17 @@ def getAllChampionInfo(api_key, region="na", ver="v1.2"):
     else:
         return None
 
+def getAllItemInfo(api_key, region="na", ver="v1.2"):
+    api_server = "https://global.api.pvp.net" 
+    api_call = "%s/api/lol/static-data/%s/%s/item" % (api_server, region, ver)
+    qs = {"api_key": api_key}
+    r = requests.get(api_call, params=qs)
+    if r.status_code == 200:
+        rj = r.json()
+        return rj
+    else:
+        return None
+
 def increaseId(match_id, inc=1):
     next_match_id = str(int(match_id) + inc)
     return next_match_id

@@ -114,14 +114,14 @@ def initIndexOfMatches(es, index_name="match", doc_type="details"):
     es.indices.create(index=index_name, body=index_settings)
     return None
 
-def initIndexOfStatics(es, index_name="statics", doc_champ="champ"):
+def initIndexOfStatics(es, index_name="statics"):
     index_settings = {
         "settings": {
             "number_of_shards": 1,
             "number_of_replicas": 0
             }, 
         "mappings": {
-            doc_champ: {
+            "champs": {
                 "properties": {
                     "key": {
                         "type":  "string",
@@ -132,6 +132,26 @@ def initIndexOfStatics(es, index_name="statics", doc_champ="champ"):
                         "index": "not_analyzed"
                         },
                     "title": {
+                        "type":  "string",
+                        "index": "not_analyzed"
+                        }
+                    }
+                },
+            "items": {
+                "properties": {
+                    "name": {
+                        "type":  "string",
+                        "index": "not_analyzed"
+                        },
+                    "group": {
+                        "type":  "string",
+                        "index": "not_analyzed"
+                        },
+                    "plaintext": {
+                        "type":  "string",
+                        "index": "not_analyzed"
+                        },
+                    "description": {
                         "type":  "string",
                         "index": "not_analyzed"
                         }
