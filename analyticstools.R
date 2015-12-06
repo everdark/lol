@@ -31,9 +31,22 @@ scrollAll <- function(res) {
     dat
 }
 
+searchWithBody <- function(index, type, body, size) {
+    res <-
+        if ( is.null(size) ) {
+            Search(index=index, type=type, body=body,
+                   search_type="scan", scroll="1m", size=1000) %>% scrollAll
+        } else {
+            Search(index=index, type=type, body=body, size=size)$hits$hits
+        }
+    res
+}
+
 checkStaticFile <- function() {
     if ( !file.exists("statics/champion_id.json") )
-        system("./dump_champion_info.py")
+        system("./dump_statics_champ.py")
+    if ( !file.exists("statics/item.json") )
+        system("./dump_statics_item.py")
 }
 
 getChampionIdByName <- function(champ_name, champ_table=champion_id) {
@@ -52,7 +65,7 @@ getChampionIdByName <- function(champ_name, champ_table=champion_id) {
     out
 }
 
-getMatchByChampion <- function(champ, size=NULL) {
+getMatchByChampion <- function(champ, keep=NULL, size=NULL) {
     if ( !is.numeric(champ) )
         champ <- getChampionIdByName(champ)
     term <- 
@@ -62,8 +75,16 @@ getMatchByChampion <- function(champ, size=NULL) {
             sprintf('"terms" : { "participants.championId": [%s] }', 
                     paste(champ, collapse=','))
         }
+    source_filter <- 
+        paste('"_source": ',
+        if ( !is.null(keep) ) {
+            paste0('[', paste(sprintf('"%s"', keep), collapse=','), ']')
+        } else {
+            "true"
+        }, collapse='')
     query <- sprintf('
     {
+        %s,
         "query": {
             "filtered": {
                 "query": {
@@ -74,22 +95,29 @@ getMatchByChampion <- function(champ, size=NULL) {
                 }
             }
         }
-    }', term)
-    res <-
-        if ( is.null(size) ) {
-            Search(index="match", type="details", body=query,
-                   search_type="scan", scroll="1m", size=1000) %>% scrollAll
-        } else {
-            Search(index="match", type="details", body=query, size=size)$hits$hits
-        }
+    }', source_filter, term)
+    res <- searchWithBody(index="match", type="details", body=query, size=size)
     res
+}
+
+getItemsByChampion <- function(champ, size=NULL) {
+    stats <- getMatchByChampion(champ=champ, size=size) %>%
+        lapply(function(x) x$`_source`$participants) %>%
+        lapply(function(x) 
+               x[sapply(x, function(y) 
+                           y$championId == getChampionIdByName(champ))]) %>%
+        lapply(function(x) x[[1]]$stats) %>%
+        rbindlist(fill=TRUE)
+    stats[, grep("item", names(stats)), with=FALSE]
 }
 
 ###########################
 ## define helper objects ##
 ###########################
+config <- readIniConfig("config/conf.ini")
 checkStaticFile()
 champion_id <- as.data.table(stream_in(file(config$static["champion_id"])))
+item_id <- as.data.table(stream_in(file(config$static["item"])))
 
 
 
