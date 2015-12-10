@@ -6,6 +6,7 @@ crawler:
     - /mnt/data/logstash:/data
   working_dir: /code
   command: python crawler.py
+  restart: unless-stopped
 
 elastic:
   container_name: elk_elastic
@@ -14,6 +15,7 @@ elastic:
     - "9200:9200"
   volumes:
     - /mnt/data/elasticsearch:/elastic_data
+  restart: unless-stopped
   environment:
     ES_HEAP_SIZE: 4g
 
@@ -24,6 +26,7 @@ logstash:
     - /mnt/data/logstash:/data
   entrypoint: ./entrypoint.sh
   command: ./bin/logstash -f ./config/logstash.conf
+  restart: unless-stopped
   links:
     - elastic
   environment:
@@ -33,6 +36,7 @@ kibana:
   container_name: elk_kibana
   # build: ./kibana
   image: kibana:4.2.1
+  restart: unless-stopped
   environment:
     ELASTICSEARCH_URL: http://elastic:9200
   ports:
